@@ -34,7 +34,7 @@ const FocalPointMask = (props: PropsWithChildren<FocalPointMaskProps>) => {
   };
 
   useResizeObserver(maskElement, () => {
-    const { offsetWidth, offsetHeight } = maskElement.current ?? {};
+    const { offsetWidth, offsetHeight } = maskElement.current || {};
     if (offsetWidth != null && offsetHeight != null) {
       setMaskRatio(offsetWidth / offsetHeight);
     }
