@@ -1,0 +1,60 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "semistandard",
+    "plugin:react/recommended"
+  ],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "max-len": ["error", {
+      "code": 80,
+      "ignorePattern": "^(import|export)\\s.+\\sfrom\\s.+;$",
+      "ignoreUrls": true,
+      "ignoreTemplateLiterals": true,
+      "ignoreRegExpLiterals": true
+    }],
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"]
+  },
+  "globals": {
+    "jest": true,
+    "describe": true,
+    "it": true,
+    "should": true,
+    "beforeEach": true,
+    "afterEach": true,
+    "test": true,
+    "expect": true,
+    "cy": true
+  },
+  "overrides": [
+    {
+      "files": "*.ts",
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "semistandard"
+      ],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": ["error", {
+          "ignoreRestArgs": true
+        }]
+      }
+    },
+    {
+    "files": "*.{test,spec}.{js,ts}",
+    "rules": {
+      "@typescript-eslint/ban-ts-comment": "off",
+      "max-len": ["error", {
+        "code": 80,
+        "ignorePattern": "(^| +)it[(]|^(import|export)\\s.+\\sfrom\\s.+;$",
+        "ignoreUrls": true,
+        "ignoreTemplateLiterals": true,
+        "ignoreRegExpLiterals": true
+      }]
+    }
+  }]
+}

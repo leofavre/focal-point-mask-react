@@ -1,0 +1,10 @@
+{
+  "mount": {
+    "public": { "url": "/", "static": true },
+    "src": "/"
+  },
+  "devOptions": {
+    "out": "temp",
+    "open": "none"
+  }
+}
