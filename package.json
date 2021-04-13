@@ -4,12 +4,13 @@
   "description": "Focal Point Mask for React",
   "main": "dist/index.js",
   "scripts": {
-    "start": "snowpack dev --port 8080",
     "build": "tsc",
-    "test": "jest --coverage",
+    "prepublish": "rimraf dist && npm run build",
     "send-coverage": "cat ./coverage/lcov.info | coveralls",
-    "typecheck": "tsc --noEmit",
-    "prepublish": "rimraf dist && npm run build"
+    "start-storybook": "start-storybook -s ./public -p 6006",
+    "start": "snowpack dev --port 8080",
+    "test": "jest --coverage",
+    "test-typescript": "tsc --noEmit"
   },
   "author": "Leonardo Favre <leo@leofavre.com> (https://www.leofavre.com/)",
   "license": "MIT",
