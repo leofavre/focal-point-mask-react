@@ -1,22 +1,36 @@
 import styled from 'styled-components';
-import type { FocalPoint } from '../types/FocalPoint';
+import { CENTER } from '../helpers/parsePosition';
 
-const Wrapper = styled.div<{ focalPoint: FocalPoint; clipSides: boolean; }>`
+export interface WrapperProps {
+  clipSides: boolean;
+  keepUserRatio: boolean;
+  minWidth: number;
+  minHeight: number;
+  top: number;
+  left: number;
+  ratio: number;
+}
+
+const Wrapper = styled.div<Partial<WrapperProps>>`
   position: relative;
   display: block;
   overflow: hidden;
-  width: 100%;
-  height: 100%;
 
   img, video {
     position: absolute;
     display: block;
-    width: ${({ clipSides }) => clipSides ? '100%' : 'auto'};
-    height: ${({ clipSides }) => clipSides ? 'auto' : '100%'};
-    top: ${({ focalPoint }) => `${focalPoint[0]}%`};
-    left: ${({ focalPoint }) => `${focalPoint[1]}%`};
-    transform: ${({ focalPoint }) =>
-      `translate(-${focalPoint[1]}%, -${focalPoint[0]}%)`};
+    width: ${({ clipSides }) => clipSides ? 'auto' : '100%'};
+    min-width: ${({ minWidth = 0 }) => `${minWidth}px`};
+    height: ${({ clipSides }) => clipSides ? '100%' : 'auto'};
+    min-height: ${({ minHeight = 0 }) => `${minHeight}px`};
+    top: ${({ top = CENTER }) => `${top}%`};
+    left: ${({ left = CENTER }) => `${left}%`};
+    transform: ${({ top = CENTER, left = CENTER }) =>
+      `translate(${left * -1}%, ${top * -1}%)`};
+    aspect-ratio: ${({ keepUserRatio, ratio }) => keepUserRatio && ratio
+      ? `${ratio}/1`
+      : ''
+    };
   }
 
   picture {
