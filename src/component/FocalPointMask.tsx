@@ -2,35 +2,39 @@ import React, { useState, useRef, useLayoutEffect, PropsWithChildren, HTMLAttrib
 import useResizeObserver from '@react-hook/resize-observer';
 import Wrapper from './Wrapper';
 import getMediaRatio from '../helpers/getMediaRatio';
-import type { FocalPoint } from '../types/FocalPoint';
-
-type MaybeNumber = number | undefined;
+import parseAspectRatio from '../helpers/parseAspectRatio';
+import parsePosition, { CENTER } from '../helpers/parsePosition';
+import type { WrapperProps } from './Wrapper';
 
 interface FocalPointMaskProps extends HTMLAttributes<HTMLDivElement> {
-  focalPoint?: FocalPoint;
-  preloadRatio?: MaybeNumber;
+  focalPoint?: string;
+  mediaRatio?: string;
+  mediaMinWidth?: number;
+  mediaMinHeight?: number;
 }
 
 const FocalPointMask = (props: PropsWithChildren<FocalPointMaskProps>) => {
   const {
-    focalPoint = [50, 50],
-    preloadRatio,
+    focalPoint,
+    mediaRatio,
+    mediaMinWidth,
+    mediaMinHeight,
     children,
     ...restProps
   } = props;
 
   const maskElement = useRef<HTMLDivElement>(null);
-
   const [maskRatio, setMaskRatio] = useState<number>();
-  const [mediaRatio, setMediaRatio] = useState<MaybeNumber>(preloadRatio);
-  const [clipSides, setClipSides] = useState<boolean>();
+  const [ratio, setRatio] = useState<number>();
+  const [keepUserRatio, setKeepUserRatio] = useState<boolean>();
+  const [wrapperProps, setWrapperProps] = useState<WrapperProps>();
 
-  const handleLoad = ({ target }) => {
-    setMediaRatio(getMediaRatio(target));
-  };
-
-  const handleLoadedMetadata = ({ target }) => {
-    setMediaRatio(getMediaRatio(target));
+  const handleEveryLoad = ({ target }) => {
+    const userRatio = parseAspectRatio(mediaRatio);
+    const naturalRatio = getMediaRatio(target);
+    const ratio = userRatio || naturalRatio || undefined;
+    setRatio(ratio);
+    setKeepUserRatio(userRatio !== naturalRatio);
   };
 
   useResizeObserver(maskElement, () => {
@@ -41,18 +45,45 @@ const FocalPointMask = (props: PropsWithChildren<FocalPointMaskProps>) => {
   });
 
   useLayoutEffect(() => {
-    if (maskRatio != null && mediaRatio != null) {
-      setClipSides(maskRatio > mediaRatio);
+    if (maskRatio != null && ratio != null) {
+      const clipSides = maskRatio < ratio;
+      const [top = CENTER, left = CENTER] = parsePosition(focalPoint) || [];
+
+      const minWidth = Math.max(
+        mediaMinWidth || 0,
+        (mediaMinHeight || 0) * ratio
+      );
+
+      const minHeight = Math.max(
+        (mediaMinWidth || 0) / ratio,
+        mediaMinHeight || 0
+      );
+
+      setWrapperProps({
+        clipSides,
+        keepUserRatio: Boolean(keepUserRatio),
+        minWidth,
+        minHeight,
+        top,
+        left,
+        ratio
+      });
     }
-  }, [maskRatio, mediaRatio]);
+  }, [
+    focalPoint,
+    ratio,
+    keepUserRatio,
+    maskRatio,
+    mediaMinWidth,
+    mediaMinHeight
+  ]);
 
   return (
     <Wrapper
       ref={maskElement}
-      onLoad={handleLoad}
-      onLoadedMetadata={handleLoadedMetadata}
-      focalPoint={focalPoint}
-      clipSides={Boolean(clipSides)}
+      onLoad={handleEveryLoad}
+      onLoadedMetadata={handleEveryLoad}
+      {...wrapperProps}
       {...restProps}
     >
       {children}
