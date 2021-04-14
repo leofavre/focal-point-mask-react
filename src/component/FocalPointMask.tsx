@@ -24,13 +24,14 @@ const FocalPointMask = (props: PropsWithChildren<FocalPointMaskProps>) => {
   } = props;
 
   const maskElement = useRef<HTMLDivElement>(null);
+  const userRatio = parseAspectRatio(mediaRatio);
+
   const [maskRatio, setMaskRatio] = useState<number>();
-  const [ratio, setRatio] = useState<number>();
-  const [keepUserRatio, setKeepUserRatio] = useState<boolean>();
+  const [ratio, setRatio] = useState<number | undefined>(userRatio);
+  const [keepUserRatio, setKeepUserRatio] = useState<boolean>(true);
   const [wrapperProps, setWrapperProps] = useState<WrapperProps>();
 
   const handleEveryLoad = ({ target }) => {
-    const userRatio = parseAspectRatio(mediaRatio);
     const naturalRatio = getMediaRatio(target);
     const ratio = userRatio || naturalRatio || undefined;
     setRatio(ratio);
